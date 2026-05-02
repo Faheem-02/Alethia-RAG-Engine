@@ -1,161 +1,218 @@
-# RAG System (FastAPI + Next.js)
+# 🧠 Aletheia RAG Engine — Explainable AI Retrieval System
 
-A modular Retrieval-Augmented Generation (RAG) demo project with:
-- A Python FastAPI backend for ingestion, retrieval, generation, and verification
-- A minimal Next.js frontend to interact with the pipeline
-- API-first behavior with mock fallback when provider limits/credits fail
+A full-stack Retrieval-Augmented Generation (RAG) system designed to deliver **context-grounded, explainable answers** instead of relying on uncontrolled model memory.
 
-## Project Intent
+---
 
-This project is designed to clearly demonstrate a full RAG flow:
-1. Ingest source text
-2. Chunk and embed the text
-3. Store vectors in FAISS
-4. Retrieve and rerank relevant chunks for a query
-5. Generate a grounded answer
-6. Verify confidence and source support
+## 🚀 Overview
 
-The codebase prioritizes readability and modularity so each stage can be understood independently.
+This project implements a **complete, production-style RAG pipeline** with a focus on:
 
-## Repository Layout
+* Reliability over hallucination
+* Explainability over black-box outputs
+* System design over simple workflows
 
-```text
-rag-system/
-├─ backend/
-│  ├─ app/
-│  │  ├─ main.py                  # FastAPI app and API endpoints
-│  │  ├─ config/settings.py       # Env-driven settings
-│  │  ├─ ingestion/ingest.py      # Text chunking
-│  │  ├─ embedding/embed.py       # Embedding (OpenAI first, mock fallback)
-│  │  ├─ retrieval/retrieve.py    # Vector retrieval
-│  │  ├─ reranking/rerank.py      # Candidate reranking
-│  │  ├─ generation/generate.py   # Answer generation (OpenAI first, mock fallback)
-│  │  ├─ verification/verify.py   # Confidence/source verification
-│  │  ├─ storage/faiss_store.py   # FAISS persistence and search
-│  │  └─ utils/logger.py          # Logging helper
-│  ├─ tests/
-│  │  ├─ conftest.py
-│  │  └─ test_pipeline.py
-│  └─ requirements.txt
-├─ frontend/
-│  ├─ app/page.js                 # Single-page RAG UI
-│  ├─ app/ingest/route.js         # Proxy to backend /ingest
-│  └─ app/query/route.js          # Proxy to backend /query
-└─ README.md
+Unlike typical chatbot demos, this system explicitly separates:
+
+> **Knowledge → Retrieval → Reasoning → Verification**
+
+---
+
+## 🎯 Problem It Solves
+
+Most AI systems:
+
+* Generate answers without grounding ❌
+* Cannot explain where information comes from ❌
+* Fail under API limits or missing context ❌
+
+---
+
+### This system solves that by:
+
+* Retrieving relevant knowledge from stored data
+* Generating answers grounded in context
+* Providing confidence scores and source attribution
+* Falling back safely when APIs fail
+
+---
+
+## 🏗️ System Architecture
+
+### 🔹 Backend (FastAPI)
+
+Modular pipeline:
+
+```
+Ingestion → Embedding → Storage (FAISS)
+        → Retrieval → Reranking
+        → Generation → Verification
 ```
 
-## Backend API
+Key characteristics:
 
-Base URL:
-- `http://127.0.0.1:8000`
+* API-first design
+* Deterministic mock fallback
+* Modular separation of concerns
+* Observability via debug endpoints
 
-Endpoints:
-- `GET /health` - service health
-- `POST /ingest` - ingest raw text and create embeddings
-- `POST /query` - run retrieval + reranking + generation + verification
-- `GET /debug/chunks` - inspect metadata currently in FAISS
+---
 
-## API-First with Mock Fallback
+### 🔹 Frontend (Next.js)
 
-Current behavior:
-- Backend attempts OpenAI API calls first for embeddings and generation.
-- Mock behavior is fallback-only when:
-  - `OPENAI_API_KEY` is unavailable and `MOCK_MODE=true`, or
-  - provider errors indicate quota/credit/rate-limit/billing constraints
-- Non-fallback errors are raised as valid errors.
+Minimal UI for system interaction:
 
-This gives real model behavior by default while keeping demos resilient when credits are exhausted.
+* Upload knowledge (ingestion)
+* Ask questions (query)
+* View:
 
-## Prerequisites
+  * Answer
+  * Confidence score
+  * Sources
+  * Retrieved & reranked chunks
 
-- Python 3.10+ (3.11 recommended)
-- Node.js 18+ and npm
+---
 
-## Setup
+## ⚙️ Core Features
 
-### 1) Backend
+* ✅ Context-grounded answers (no blind hallucination)
+* ✅ Multi-document retrieval
+* ✅ Confidence scoring mechanism
+* ✅ Source traceability
+* ✅ API-first execution with fallback
+* ✅ Deterministic mock mode (no API required)
+* ✅ Debug visibility (retrieval + reranking pipeline)
 
-From `rag-system` root:
+---
 
-```bash
-python -m venv .venv
+## 🔁 Execution Flow
+
+1. User ingests raw text
+2. System chunks and embeds content
+3. Vectors stored in FAISS
+4. Query triggers retrieval
+5. Results reranked
+6. Answer generated from context
+7. Output verified with confidence + sources
+
+---
+
+## 🧪 Example
+
+**Input Knowledge**
+
+```
+AI systems store knowledge and answer queries using context.
 ```
 
-Activate virtual environment:
+**Query**
 
-Windows PowerShell:
-
-```bash
-.venv\Scripts\Activate.ps1
+```
+How does the system answer questions?
 ```
 
-Install dependencies:
+**Output**
+
+* Context-derived answer
+* Confidence score
+* Source references
+
+---
+
+## 🛠️ Tech Stack
+
+### Backend
+
+* FastAPI
+* FAISS (vector similarity search)
+* Python
+
+### Frontend
+
+* Next.js (App Router)
+* Tailwind CSS
+
+---
+
+## ▶️ Running Locally
+
+### Backend
 
 ```bash
+cd backend
+python -m venv venv
+.\venv\Scripts\activate
 pip install -r requirements.txt
-```
-
-Create environment variables (shell or `.env` in `backend`):
-
-```env
-OPENAI_API_KEY=your_key_here
-EMBEDDING_MODEL=text-embedding-3-small
-GENERATION_MODEL=gpt-4o-mini
-MOCK_MODE=true
-MOCK_SEED=42
-FAISS_INDEX_PATH=data/faiss.index
-```
-
-Run backend:
-
-```bash
 python -m uvicorn backend.app.main:app --reload
 ```
 
-### 2) Frontend
+---
 
-From `rag-system/frontend`:
+### Frontend
 
 ```bash
+cd frontend
 npm install
 npm run dev
 ```
 
-Open:
-- `http://localhost:3000`
+---
 
-The frontend page includes:
-- Upload section (`/ingest`)
-- Query section (`/query`)
-- Answer section (answer, confidence, sources)
-- Debug section (retrieved chunks, reranked chunks)
+### Access
 
-## Test Commands
-
-Backend tests:
-
-```bash
-cd backend
-python -m pytest -q
+```
+http://localhost:3000
 ```
 
-Frontend build check:
+---
 
-```bash
-cd frontend
-npm run build
-```
+## 🔁 Modes
 
-## Typical End-to-End Flow
+### Mock Mode (Default)
 
-1. Start backend server
-2. Start frontend server
-3. Paste text in Upload section and click **Ingest**
-4. Ask a query in Query section and click **Ask**
-5. Inspect answer and debug chunks in UI
+* No API required
+* Context-aware deterministic responses
 
-## Notes for Contributors
+---
 
-- Keep module boundaries intact (ingestion/embedding/retrieval/reranking/generation/verification)
-- Avoid coupling UI logic with backend internals
-- Prefer deterministic behavior in tests and mock fallback responses
+### API Mode (Optional)
+
+* Uses OpenAI for embeddings + generation
+* Falls back automatically on quota/rate-limit issues
+
+---
+
+## 📌 Key Design Decisions
+
+* **API-first architecture** → aligns with real-world systems
+* **Fallback mechanism** → prevents failure under constraints
+* **Explainability layer** → exposes retrieval + reasoning path
+* **Modular pipeline** → independently testable components
+
+---
+
+## 🚀 Why This Project Stands Out
+
+This is not a simple chatbot.
+
+It demonstrates:
+
+* Separation of retrieval and generation
+* Controlled, non-hallucinating design
+* Explainable AI outputs
+* Real-world system reliability patterns
+
+---
+
+## 📈 Future Improvements
+
+* Semantic reranking (cross-encoder)
+* Better confidence calibration
+* Streaming responses
+* Cloud deployment (Vercel + backend hosting)
+
+---
+
+## 👨‍💻 Author
+
+Built with a focus on **system design, explainable AI, and production-ready architecture**.
