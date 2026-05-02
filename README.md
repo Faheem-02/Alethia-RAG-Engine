@@ -168,17 +168,34 @@ http://localhost:3000
 
 ## 🔁 Modes
 
-### Mock Mode (Default)
+### API Mode (Primary)
 
-* No API required
-* Context-aware deterministic responses
+* Uses OpenAI for embeddings and answer generation
+* Default execution path when API key is available
+* Produces higher-quality, model-driven responses
 
 ---
 
-### API Mode (Optional)
+### Mock Fallback Mode
 
-* Uses OpenAI for embeddings + generation
-* Falls back automatically on quota/rate-limit issues
+* Automatically activated when:
+
+  * API key is missing and `MOCK_MODE=true`, or
+  * provider errors occur (quota, rate limit, billing issues)
+* Generates deterministic, context-aware responses from retrieved chunks
+* Ensures system reliability even without external API access
+
+---
+
+### ⚙️ Behavior Summary
+
+| Condition                    | Mode          |
+| ---------------------------- | ------------- |
+| Valid API key + working API  | API Mode      |
+| API limit / quota exceeded   | Mock Fallback |
+| No API key + MOCK_MODE=true  | Mock Mode     |
+| No API key + MOCK_MODE=false | Error         |
+
 
 ---
 
@@ -214,5 +231,5 @@ It demonstrates:
 ---
 
 ## 👨‍💻 Author
-
+Faheem
 Built with a focus on **system design, explainable AI, and production-ready architecture**.
